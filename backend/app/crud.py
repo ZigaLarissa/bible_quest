@@ -1,32 +1,11 @@
 from bson import ObjectId
 from app.schemas.user import UserCreate, UserList
 from pymongo.database import Database
+import hashlib
 
 # User CRUD operations
-def get_user(db: Database, user_id: str):
-    user = db.users.find_one({"_id": ObjectId(user_id)})
-    if user:
-        user["id"] = str(user["_id"])
-        del user["_id"]
-    return user
-
-def get_user_by_email(db: Database, email: str):
-    user = db.users.find_one({"email": email})
-    if user:
-        user["id"] = str(user["_id"])
-        del user["_id"]
-    return user
-
-def get_users(db: Database, skip: int = 0, limit: int = 100):
-    users = list(db.users.find().skip(skip).limit(limit))
-    for user in users:
-        user["id"] = str(user["_id"])
-        del user["_id"]
-    total = db.users.count_documents({})
-    return UserList(users=users, total=total)
-
 def create_user(db: Database, user: UserCreate):
-    hashed_password = user.password + "notreallyhashed"
+    hashed_password = hashlib.sha256(user.password.encode()).hexdigest()
     user_dict = user.dict()
     user_dict["hashed_password"] = hashed_password
     del user_dict["password"]
@@ -42,10 +21,37 @@ def create_user(db: Database, user: UserCreate):
 
     return created_user
 
+
+def get_user(db: Database, user_id: str):
+    user = db.users.find_one({"_id": ObjectId(user_id)})
+    if user:
+        user["id"] = str(user["_id"])
+        del user["_id"]
+    return user
+
+
+def get_user_by_email(db: Database, email: str):
+    user = db.users.find_one({"email": email})
+    if user:
+        user["id"] = str(user["_id"])
+        del user["_id"]
+    return user
+
+
+def get_users(db: Database, skip: int = 0, limit: int = 100):
+    users = list(db.users.find().skip(skip).limit(limit))
+    for user in users:
+        user["id"] = str(user["_id"])
+        del user["_id"]
+    total = db.users.count_documents({})
+    return UserList(users=users, total=total)
+
+
 def delete_user(db: Database, user_id: str):
     user = db.users.delete_one({"_id": ObjectId(user_id)})
     if user.deleted_count:
         return {"id": user_id}
+
 
 # Category CRUD operations
 # def create_category(db: Database, category: CategoryCreate):
