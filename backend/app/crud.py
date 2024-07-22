@@ -43,8 +43,9 @@ def create_user(db: Database, user: UserCreate):
     return created_user
 
 def delete_user(db: Database, user_id: str):
-    result = db.users.delete_one({"_id": ObjectId(user_id)})
-    return result.deleted_count > 0
+    user = db.users.delete_one({"_id": ObjectId(user_id)})
+    if user.deleted_count:
+        return {"id": user_id}
 
 # Category CRUD operations
 # def create_category(db: Database, category: CategoryCreate):
