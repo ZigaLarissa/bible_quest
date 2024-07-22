@@ -1,24 +1,46 @@
 from bson import ObjectId
-from app.schemas.user import UserCreate
+from app.schemas.user import UserCreate, UserList
 from pymongo.database import Database
 
 # User CRUD operations
 def get_user(db: Database, user_id: str):
-    return db.users.find_one({"_id": ObjectId(user_id)})
+    user = db.users.find_one({"_id": ObjectId(user_id)})
+    if user:
+        user["id"] = str(user["_id"])
+        del user["_id"]
+    return user
 
 def get_user_by_email(db: Database, email: str):
-    return db.users.find_one({"email": email})
+    user = db.users.find_one({"email": email})
+    if user:
+        user["id"] = str(user["_id"])
+        del user["_id"]
+    return user
 
 def get_users(db: Database, skip: int = 0, limit: int = 100):
-    return list(db.users.find().skip(skip).limit(limit))
+    users = list(db.users.find().skip(skip).limit(limit))
+    for user in users:
+        user["id"] = str(user["_id"])
+        del user["_id"]
+    total = db.users.count_documents({})
+    return UserList(users=users, total=total)
 
 def create_user(db: Database, user: UserCreate):
     hashed_password = user.password + "notreallyhashed"
     user_dict = user.dict()
     user_dict["hashed_password"] = hashed_password
     del user_dict["password"]
+    # Insert the user into the database
     result = db.users.insert_one(user_dict)
-    return db.users.find_one({"_id": result.inserted_id})
+
+    # Retrieve the inserted user document
+    created_user = db.users.find_one({"_id": result.inserted_id})
+
+    # Convert the ObjectId to a string
+    created_user["id"] = str(created_user["_id"])
+    del created_user["_id"]
+
+    return created_user
 
 def delete_user(db: Database, user_id: str):
     result = db.users.delete_one({"_id": ObjectId(user_id)})
