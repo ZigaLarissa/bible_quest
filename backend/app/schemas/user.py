@@ -23,3 +23,18 @@ class UserList(BaseModel):
 
     class Config:
         orm_mode = True
+
+class UserDelete(BaseModel):
+    id: str
+
+    class Config:
+        orm_mode = True
+
+
+class UserUpdate(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+
+    class Config:
+        orm_mode = True

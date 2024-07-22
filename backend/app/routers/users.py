@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from pymongo.database import Database
 from bson import ObjectId
 
-from app.schemas.user import User, UserCreate, UserList
-from app.crud import get_users, get_user_by_email, get_user, create_user, delete_user
+from app.schemas.user import User, UserCreate, UserList, UserDelete, UserUpdate
+from app.crud import get_users, get_user_by_email, get_user, create_user, delete_user, update_user
 from app.services.database import get_database
 
 router = APIRouter()
@@ -43,7 +43,16 @@ async def read_users(skip: int = 0, limit: int = 10, db: Database = Depends(get_
     return users
 
 
-@router.delete("/users/{user_id}", response_model=dict, tags=["users"])
+# Update a user by ID
+@router.put("/users/{user_id}", response_model=User, tags=["users"])
+def update_user_by_id(user_id: str, user_update: UserUpdate, db: Database = Depends(get_db)):
+    db_user = update_user(db, user_id=user_id, user_update=user_update)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
+
+
+@router.delete("/users/{user_id}", response_model=UserDelete, tags=["users"])
 async def remove_user(user_id: str, db: Database = Depends(get_db)):
     db_user = delete_user(db, user_id=user_id)
     if db_user is None:

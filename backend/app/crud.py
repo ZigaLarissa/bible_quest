@@ -1,7 +1,9 @@
 from bson import ObjectId
-from app.schemas.user import UserCreate, UserList
+from app.schemas.user import UserCreate, UserList, UserUpdate
 from pymongo.database import Database
 import hashlib
+from fastapi import HTTPException, status
+from bson.errors import InvalidId
 
 # User CRUD operations
 def create_user(db: Database, user: UserCreate):
@@ -20,6 +22,25 @@ def create_user(db: Database, user: UserCreate):
     del created_user["_id"]
 
     return created_user
+
+
+def update_user(db: Database, user_id: str, user_update: UserUpdate):
+    try:
+        obj_id = ObjectId(user_id)
+    except InvalidId:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid user ID")
+
+    update_data = user_update.dict(exclude_unset=True)
+    if "password" in update_data:
+        update_data["hashed_password"] = hashlib.sha256(update_data["password"].encode()).hexdigest()
+        del update_data["password"]
+
+    result = db.users.update_one({"_id": obj_id}, {"$set": update_data})
+    if result.modified_count == 1:
+        user = db.users.find_one({"_id": obj_id})
+        user["id"] = str(user.pop("_id"))
+        return user
+    return None
 
 
 def get_user(db: Database, user_id: str):
