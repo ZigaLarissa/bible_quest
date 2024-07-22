@@ -1,51 +1,65 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
-from sqlalchemy.orm import relationship
+from pydantic import BaseModel, Field, EmailStr
+from typing import List, Optional
+from datetime import datetime
+from bson import ObjectId
 
-from services.database import Base
+class PyObjectId(ObjectId):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
 
+    @classmethod
+    def validate(cls, v):
+        if not ObjectId.is_valid(v):
+            raise ValueError("Invalid objectid")
+        return ObjectId(v)
 
-class User(Base):
-    __tablename__ = "users"
+    @classmethod
+    def __modify_schema__(cls, field_schema):
+        field_schema.update(type="string")
 
-    id = Column(Integer, primary_key=True)
-    email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
-    is_active = Column(Boolean, default=True)
+class User(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    email: EmailStr
+    hashed_password: str
+    is_active: bool = True
 
-    progress = relationship("UserProgress", back_populates="user")
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
 
+class Category(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    name: str
 
-class Category(Base):
-    __tablename__ = "categories"
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
+class Question(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    question_text: str
+    correct_answer: str
+    category_id: PyObjectId
+    incorrect_answer1: str
+    incorrect_answer2: str
+    incorrect_answer3: str
 
-    questions = relationship("Question", back_populates="category")
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
 
+class UserProgress(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    user_id: PyObjectId
+    question_id: PyObjectId
+    is_correct: bool = False
+    time_stamp: datetime = Field(default_factory=datetime.utcnow)
 
-class Question(Base):
-    __tablename__ = "questions"
-
-    id = Column(Integer, primary_key=True, index=True)
-    question_text = Column(String)
-    correct_answer = Column(String)
-    category_id = Column(Integer, ForeignKey("categories.id"))
-    incorrect_answer1 = Column(String)
-    incorrect_answer2 = Column(String)
-    incorrect_answer3 = Column(String)
-
-    category = relationship("Category", back_populates="questions")
-    progress = relationship("Progress", back_populates="questions")
-
-class UserProress(Base):
-    __tablename__ = "user_progress"
-
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    question_id = Column(Integer, ForeignKey("questions.id"))
-    is_correct = Column(Boolean, default=False)
-    time_stamp = Column(DateTime)
-
-    user = relationship("User", back_populates="progress")
-    question = relationship("Question", back_populates="progress")
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}

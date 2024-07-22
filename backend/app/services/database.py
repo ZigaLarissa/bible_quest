@@ -1,11 +1,9 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from pymongo import MongoClient
 
-database_url = 'mongodb+srv://lbizimungu:S9kmYKTmunyDNjNM@cluster0.gaeuej0.mongodb.net/'
+# database_url = 'mongodb+srv://lbizimungu:S9kmYKTmunyDNjNM@cluster0.gaeuej0.mongodb.net/'
+database_url = 'mongodb+srv://lbizimungu:S9kmYKTmunyDNjNM@cluster0.gaeuej0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
+client = MongoClient(database_url)
+Database = client['quiz_app']
 
-engine = create_engine(database_url)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base = declarative_base()
+def get_database():
+    return Database

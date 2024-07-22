@@ -1,30 +1,50 @@
-from sqlalchemy.orm import Session
-from . import models, schemas
+from bson import ObjectId
+from app.schemas.user import UserCreate
+from pymongo.database import Database
 
 # User CRUD operations
-def get_user(db: Session, user_id: int):
-    return db.query(models.User).filter(models.User.id == user_id).first()
+def get_user(db: Database, user_id: str):
+    return db.users.find_one({"_id": ObjectId(user_id)})
 
-def get_user_by_email(db: Session, email: str):
-    return db.query(models.User).filter(models.User.email == email).first()
+def get_user_by_email(db: Database, email: str):
+    return db.users.find_one({"email": email})
 
-def get_users(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.User).Offset(skip).limit(limit).all()
+def get_users(db: Database, skip: int = 0, limit: int = 100):
+    return list(db.users.find().skip(skip).limit(limit))
 
-def create_user(db: Session, user: schemas.UserCreate):
+def create_user(db: Database, user: UserCreate):
     hashed_password = user.password + "notreallyhashed"
-    db_user = models.User(email=user.email, hashed_password=hashed_password)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    user_dict = user.dict()
+    user_dict["hashed_password"] = hashed_password
+    del user_dict["password"]
+    result = db.users.insert_one(user_dict)
+    return db.users.find_one({"_id": result.inserted_id})
 
-def delete_user(db: Session, user_id: int):
-    db_user = db.query(models.User).filter(models.User.id == user_id).first()
-    if db_user:
-        db.delete(db_user)
-        db.commit()
-    return db_user
-
+def delete_user(db: Database, user_id: str):
+    result = db.users.delete_one({"_id": ObjectId(user_id)})
+    return result.deleted_count > 0
 
 # Category CRUD operations
+# def create_category(db: Database, category: CategoryCreate):
+#     category_dict = category.dict()
+#     result = db.categories.insert_one(category_dict)
+#     return db.categories.find_one({"_id": result.inserted_id})
+
+# def get_category(db: Database, category_id: str):
+#     return db.categories.find_one({"_id": ObjectId(category_id)})
+
+# def get_categories(db: Database, skip: int = 0, limit: int = 100):
+#     return list(db.categories.find().skip(skip).limit(limit))
+
+# def update_category(db: Database, category_id: str, category: CategoryUpdate):
+#     result = db.categories.update_one(
+#         {"_id": ObjectId(category_id)},
+#         {"$set": category.dict(exclude_unset=True)}
+#     )
+#     if result.modified_count > 0:
+#         return db.categories.find_one({"_id": ObjectId(category_id)})
+#     return None
+
+# def delete_category(db: Database, category_id: str):
+#     result = db.categories.delete_one({"_id": ObjectId(category_id)})
+#     return result.deleted_count > 0
