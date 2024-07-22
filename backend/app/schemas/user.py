@@ -16,3 +16,10 @@ class UserInDB(UserBase):
 
 class User(UserInDB):
     pass
+
+class UserList(BaseModel):
+    users: list[User]
+    total: int
+
+    class Config:
+        orm_mode = True
