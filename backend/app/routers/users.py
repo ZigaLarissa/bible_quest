@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from pymongo.database import Database
 from bson import ObjectId
 
-from app.schemas.user import User, UserCreate, UserList, UserDelete, UserUpdate
-from app.crud import get_users, get_user_by_email, get_user, create_user, delete_user, update_user
-from app.services.database import get_database
+from schemas.user import User, UserCreate, UserList, UserDelete, UserUpdate
+from crud import get_users, get_user_by_email, get_user, create_user, delete_user, update_user
+from services.database import get_database
 
 router = APIRouter()
 

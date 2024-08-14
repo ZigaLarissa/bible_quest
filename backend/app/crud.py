@@ -1,5 +1,5 @@
 from bson import ObjectId
-from app.schemas.user import UserCreate, UserList, UserUpdate
+from schemas.user import UserCreate, UserList, UserUpdate
 from pymongo.database import Database
 import hashlib
 from fastapi import HTTPException, status

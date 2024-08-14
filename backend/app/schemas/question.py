@@ -1,4 +1,4 @@
-from pyndantic import BaseModel
+from pydantic import BaseModel
 from schemas.category import Category
 
 # Question Schemas
