@@ -11,4 +11,4 @@ class Category(CategoryBase):
     id: int
     
     class Config:
-        orm_mode = True
+        from_orm = True

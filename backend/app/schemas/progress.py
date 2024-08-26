@@ -20,4 +20,4 @@ class UserProgress(UserProgressBase):
     question:   Question
 
     class Config:
-        orm_mode = True
+        from_orm = True

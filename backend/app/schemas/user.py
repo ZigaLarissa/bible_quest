@@ -12,7 +12,7 @@ class UserInDB(UserBase):
     id: str
 
     class Config:
-        orm_mode = True
+        from_orm = True
 
 class User(UserInDB):
     pass
@@ -22,13 +22,13 @@ class UserList(BaseModel):
     total: int
 
     class Config:
-        orm_mode = True
+        from_orm = True
 
 class UserDelete(BaseModel):
     id: str
 
     class Config:
-        orm_mode = True
+        from_orm = True
 
 
 class UserUpdate(BaseModel):
@@ -37,4 +37,4 @@ class UserUpdate(BaseModel):
     password: str
 
     class Config:
-        orm_mode = True
+        from_orm = True

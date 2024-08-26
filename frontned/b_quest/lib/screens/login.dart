@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'login.dart';
+import 'signup.dart';
 
-class SignupPage extends StatefulWidget {
-  const SignupPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _SignupPageState createState() => _SignupPageState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _SignupPageState extends State<SignupPage> {
+class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   String _username = '';
-  String _email = '';
   String _password = '';
 
-  Future<void> _signup() async {
-    final url = Uri.parse('https://your-fastapi-app.onrender.com/signup');
+  Future<void> _login() async {
+    final url = Uri.parse('https://your-fastapi-app.onrender.com/login');
 
     final response = await http.post(
       url,
@@ -26,20 +25,19 @@ class _SignupPageState extends State<SignupPage> {
         'Content-Type': 'application/json',
       },
       body: json.encode({
-        'username': _username, // Adjusted field name
-        'email': _email,
+        'username': _username,
         'password': _password,
       }),
     );
 
     if (response.statusCode == 200) {
-      // Handle successful signup
+      // Handle successful login
       // ignore: avoid_print
-      print('Signup successful');
+      print('Login successful');
     } else {
       // Handle error
       // ignore: avoid_print
-      print('Signup failed: ${response.body}');
+      print('Login failed: ${response.body}');
     }
   }
 
@@ -56,7 +54,7 @@ class _SignupPageState extends State<SignupPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 const Text(
-                  'Create new Account',
+                  'Login to Your Account',
                   style: TextStyle(color: Colors.white, fontSize: 28),
                 ),
                 const SizedBox(height: 50),
@@ -78,28 +76,6 @@ class _SignupPageState extends State<SignupPage> {
                   onChanged: (value) {
                     setState(() {
                       _username = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'EMAIL',
-                    labelStyle: const TextStyle(color: Colors.white),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                          color: Color.fromARGB(255, 159, 158, 159)),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: Colors.purpleAccent),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      _email = value;
                     });
                   },
                 ),
@@ -136,10 +112,10 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      _signup();
+                      _login();
                     }
                   },
-                  child: const Text('Sign Up',
+                  child: const Text('Login',
                       style: TextStyle(fontSize: 20, color: Colors.white)),
                 ),
                 const SizedBox(height: 10),
@@ -149,11 +125,11 @@ class _SignupPageState extends State<SignupPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const LoginPage()),
+                          builder: (context) => const SignupPage()),
                     );
                   },
                   child: Text(
-                    'Already Have Account? Login!',
+                    "Don't have Account? SignUp!",
                     style: TextStyle(
                       color: Colors.purple[300],
                       decoration: TextDecoration.underline,

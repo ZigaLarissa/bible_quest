@@ -18,4 +18,4 @@ class Question(QuestionBase):
     category: Category
 
     class Config:
-        orm_mode = True
+        from_orm = True

@@ -7,7 +7,7 @@ class QuestionResponse(BaseModel):
     answers: List[str]
 
     class Config:
-        orm_mode = True
+        from_orm = True
 
 class SubmitAnswer(BaseModel):
     question_id: int
@@ -19,4 +19,4 @@ class ProgressSummary(BaseModel):
     accuracy: float
 
     class Config:
-        orm_mode = True
+        from_orm = True
