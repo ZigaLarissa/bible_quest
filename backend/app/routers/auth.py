@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import timedelta, datetime
-import jwt
 import hashlib
+import jwt
 
 from schemas.auth import Token, TokenData  # Assuming these models are defined as before
 from schemas.user import UserCreate, UserInDB   # Import your Pydantic models
