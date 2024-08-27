@@ -18,7 +18,7 @@ class _SignupPageState extends State<SignupPage> {
   String _password = '';
 
   Future<void> _signup() async {
-    final url = Uri.parse('https://your-fastapi-app.onrender.com/signup');
+    final url = Uri.parse('https://bible-quest.onrender.com/users/');
 
     final response = await http.post(
       url,

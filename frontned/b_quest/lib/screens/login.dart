@@ -17,7 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   String _password = '';
 
   Future<void> _login() async {
-    final url = Uri.parse('https://your-fastapi-app.onrender.com/login');
+    final url = Uri.parse('http://0.0.0.0:8000/token');
 
     final response = await http.post(
       url,
@@ -61,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
                 TextFormField(
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    labelText: 'NAME',
+                    labelText: 'EMAIL',
                     labelStyle: const TextStyle(color: Colors.white),
                     enabledBorder: OutlineInputBorder(
                       borderSide: const BorderSide(
